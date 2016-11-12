@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
-from django.contrib import admin
+from .views import *
 
+# /citizen/
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^user/(?P<pk>[0-9]+)/$', UserInstance.as_view(), name='user'),
 ]
