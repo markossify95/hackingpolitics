@@ -12,25 +12,30 @@ class Member(models.Model):
 
 class Speech(models.Model):
     member = models.ForeignKey(Member)
-    type = models.CharField(max_length=30)
+    speech_type = models.CharField(max_length=30)
     speech = models.TextField()
 
 
-class Acts(models.Model):
-    topics = models.ManyToManyField(Topic, through='Dates')
-    name = models.CharField(max_length=50)
-    status = models.IntegerField()  # 0-usvojen; 1-u proceduri; 2-odbijen;
-    vote_yes = models.IntegerField()
-    vote_no = models.IntegerField()
+class Act(models.Model):
+    topic = models.ManyToManyField(Topic, through='Date')
+    name = models.TextField()
+    act_type = models.CharField(max_length=20)
+    status = models.IntegerField(blank=True)  # 0-usvojen; 1-u proceduri; 2-odbijen;
+    vote_yes = models.IntegerField(blank=True)
+    vote_no = models.IntegerField(blank=True)
 
 
-class Voting(models.Model):
+class Vote(models.Model):
     member = models.ForeignKey(Member)
-    act = models.ForeignKey(Acts)
+    act = models.ForeignKey(Act)
 
 
-class Dates(models.Model):
-    topics = models.ForeignKey(Topic)
-    acts = models.ForeignKey(Acts)
+class Date(models.Model):
+    topic = models.ForeignKey(Topic)
+    act = models.ForeignKey(Act)
     date = models.DateField()
 
+
+class MemberAct(models.Model):
+    member = models.ForeignKey(Member)
+    act = models.ForeignKey(Act)
