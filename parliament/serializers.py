@@ -14,20 +14,25 @@ class SpeechSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ActsSerializer(serializers.ModelSerializer):
+class ActSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Acts
+        model = Act
         fields = '__all__'
 
 
-class VotingSerializer(serializers.ModelSerializer):
+class VoteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Voting
+        model = Vote
         fields = '__all__'
 
 
-class DatesSerializer(serializers.ModelSerializer):
+class DateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Dates
+        model = Date
         fields = '__all__'
 
+
+class MemberActSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Date
+        fields = '__all__'
