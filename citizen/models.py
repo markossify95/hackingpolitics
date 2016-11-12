@@ -8,11 +8,25 @@ class Topic(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    type = models.IntegerField(null=False)  # 0 - civil, 1 - organization, 2 - journalist, 3 - pravno lice
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "user": self.user,
+            "type": self.type,
+            "about": self.about,
+            "topics": self.topics,
+            "municip": self.municipality
+        }
+
+    user = models.OneToOneField(User, related_name='user', on_delete=models.CASCADE)
+    type = models.CharField(default="0", max_length=6)  # 0 - civil, 1 - organization, 2 - journalist, 3 - pravno lice
     about = models.TextField(blank=True)
     topics = models.ManyToManyField(Topic, through='UserTopic')
     municipality = models.CharField(default='N/A', max_length=50)
+
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
 
 
 class UserTopic(models.Model):
@@ -32,3 +46,7 @@ class UserProblem(models.Model):
     user = models.ForeignKey(Profile)
     problem = models.ForeignKey(Problem)
     vote_type = models.IntegerField(null=False, default=0)  # 0 - no! ; 1 - yes!
+
+
+class ProblemSolved(models.Model):
+    user = models.ForeignKey(Profile)

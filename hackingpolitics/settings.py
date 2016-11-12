@@ -27,6 +27,8 @@ SECRET_KEY = '7k9v8o6m!&fak^-92jplv1um6mz5hsu8-rq0lo7j^!mo3630@e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_PROFILE_MODULE = 'citizen.Profile'
+
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -38,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',
     'citizen',
     'parliament',
