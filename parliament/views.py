@@ -13,6 +13,21 @@ from django.contrib.auth import (
     login,
     logout
 )
+import bs4 as bs
+import urllib.request
+
+
+class ActView(APIView):
+    def get_object(self, pk):
+        try:
+            return Member.objects.get(pk=pk)
+        except Member.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        member = self.get_object(pk)
+        serializer = MemberSerializer(member)
+        return Response(serializer.data)
 
 
 class MemberInstance(APIView):
@@ -38,4 +53,17 @@ class MemberActsView(APIView):
             raise Http404()
 
 
+class VotesView(APIView):
+    def get_object(self, fk):
+        try:
+            return Vote.objects.get(member=fk)
+        except Vote.DoesNotExist:
+            raise Http404()
 
+    def get(self, request, fk):
+        query_set = self.get_object(fk)
+        serializer = VoteSerializer(data=query_set)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            raise Http404()

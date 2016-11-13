@@ -9,19 +9,35 @@ class ActSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
-    acts = ActSerializer()
-
     class Meta:
         model = Member
-        fields = ('member', 'acts')
+        fields = '__all__'
 
 
 class VoteSerializer(serializers.ModelSerializer):
-    act = ActSerializer()
+    acts = ActSerializer(many=True)
+    member = MemberSerializer()
 
     class Meta:
         model = Vote
         fields = '__all__'
+
+
+class BoardSerializer(serializers.ModelSerializer):
+    member = MemberSerializer(many=True)
+
+    class Meta:
+        model = Board
+        fields = ('name', 'member')
+
+
+class MemberBoardSerializer(serializers.ModelSerializer):
+    member = MemberSerializer()
+    board = BoardSerializer()
+
+    class Meta:
+        model = MemberBoard
+        fields = ('name', 'member', 'board')
 
 
 # NO NEED ???

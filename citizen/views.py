@@ -13,7 +13,7 @@ from django.contrib.auth import (
     login,
     logout
 )
-from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Q
 
 
 class UserInstance(APIView):
@@ -66,6 +66,7 @@ class LoginView(APIView):
         password = body['password']
         username = body['username']
         user = User.objects.get(username=username)
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         if user:
             authenticate(username=username, password=password)
             if user.is_authenticated():
@@ -126,12 +127,19 @@ class ProblemFilter(APIView):
         date = body['date']
         topic = body['topic']
         min = body['min']
+        search_query = body['search_query']
         result_set = Problem.objects.all()
         if date != '':
             result_set = result_set.filter(date=date)
         if topic is not []:
             result_set = result_set.filter(topic_id__in=topic)
         if min != 0:
-            result_set = result_set.filter()  # TODO
-            serializer = ProblemSerializer(result_set, many=True)
+            result_set = result_set.filter(votes_down__gte=min)  # TODO
+        if search_query:
+            result_set = Problem.objects.filter(Q(topic__category__contains=search_query) |
+                                                Q(user__first_name__contains=search_query) |
+                                                Q(user__last_name__contains=search_query) |
+                                                Q(title__contains=search_query) |
+                                                Q(description__contains=search_query))
+        serializer = ProblemSerializer(result_set, many=True)
         return Response(serializer.data)
