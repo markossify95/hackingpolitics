@@ -4,23 +4,18 @@ from citizen.models import Topic
 
 
 class Member(models.Model):
-    name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     party = models.CharField(max_length=200)
-    city = models.CharField(max_length=30)
-    profession = models.CharField(max_length=50)
-
-
-class Speech(models.Model):
-    member = models.ForeignKey(Member)
-    speech_type = models.CharField(max_length=30)
-    speech = models.TextField()
+    board_type = models.IntegerField(default=-1)
+    bio = models.TextField(max_length=36000)
 
 
 class Act(models.Model):
     topic = models.ManyToManyField(Topic, through='Date')
     name = models.TextField()
     act_type = models.CharField(max_length=20)
-    status = models.IntegerField(blank=True)  # 0-usvojen; 1-u proceduri; 2-odbijen;
+    status = models.IntegerField(blank=True)  # 1-usvojen; 0-u proceduri;
     vote_yes = models.IntegerField(blank=True)
     vote_no = models.IntegerField(blank=True)
 
@@ -39,3 +34,4 @@ class Date(models.Model):
 class MemberAct(models.Model):
     member = models.ForeignKey(Member)
     act = models.ForeignKey(Act)
+    vote = models.NullBooleanField()

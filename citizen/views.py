@@ -1,4 +1,3 @@
-import bcrypt as bcrypt
 from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework.response import Response
@@ -68,7 +67,7 @@ class LoginView(APIView):
         username = body['username']
         user = User.objects.get(username=username)
         if user:
-            authenticate(username=username,password=password)
+            authenticate(username=username, password=password)
             if user.is_authenticated():
                 login(request, user)
                 ds = UserSerializer(user)
@@ -80,13 +79,13 @@ class LoginView(APIView):
 class ProfileInstance(APIView):
     def get_object(self, pk):
         try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
             raise Http404
 
     def get(self, request, pk):
-        user = self.get_object(pk)
-        serializer = UserSerializer(user)
+        profile = self.get_object(pk)
+        serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
 
@@ -94,12 +93,12 @@ class ProblemInstance(APIView):
     def get_object(self, pk):
         try:
             return Problem.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Problem.DoesNotExist:
             raise Http404
 
     def get(self, request, pk):
-        user = self.get_object(pk)
-        serializer = ProblemSerializer(user)
+        problem = self.get_object(pk)
+        serializer = ProblemSerializer(problem)
         return Response(serializer.data)
 
 
@@ -114,7 +113,7 @@ class ProblemInstancePost(APIView):
         topic_object = Topic.objects.get(pk=topic)
         user = body['user']
         user_object = User.objects.get(pk=user)
-        problem = Problem(title=title,description=description,date=date,topic=topic_object,user=user_object)
+        problem = Problem(title=title, description=description, date=date, topic=topic_object, user=user_object)
         problem.save()
         serializer = ProblemSerializer(problem)
         return Response(serializer.data)
@@ -125,6 +124,14 @@ class ProblemFilter(APIView):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         date = body['date']
-        res = Problem.objects.filter(topic_id__in=body['topic']).filter(date=date)
-        serializer = ProblemSerializer(res,many=True)
+        topic = body['topic']
+        min = body['min']
+        result_set = Problem.objects.all()
+        if date != '':
+            result_set = result_set.filter(date=date)
+        if topic is not []:
+            result_set = result_set.filter(topic_id__in=topic)
+        if min != 0:
+            result_set = result_set.filter()  # TODO
+            serializer = ProblemSerializer(result_set, many=True)
         return Response(serializer.data)

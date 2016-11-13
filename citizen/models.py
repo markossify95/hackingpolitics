@@ -40,6 +40,8 @@ class Problem(models.Model):
     date = models.DateField(null=False)
     title = models.TextField(max_length=140)
     description = models.TextField(default="")
+    votes_up = models.IntegerField(default=0)
+    votes_down = models.IntegerField(default=0)
 
 
 class UserProblem(models.Model):

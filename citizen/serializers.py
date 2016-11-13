@@ -15,12 +15,18 @@ class TopicSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    topics = TopicSerializer(many=True)
+
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ('user', 'type', 'id', 'about', 'topics', 'municipality')
 
 
 class ProblemSerializer(serializers.ModelSerializer):
+    topic = TopicSerializer()
+    user = UserSerializer()
+
     class Meta:
         model = Problem
         fields = '__all__'
