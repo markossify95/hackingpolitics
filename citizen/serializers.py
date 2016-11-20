@@ -32,6 +32,12 @@ class ProblemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SimpleProblemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Problem
+        fields = '__all__'
+
+
 class UserTopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserTopic

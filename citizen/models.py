@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Topic(models.Model):
     users = models.ManyToManyField(User, through='Problem')
     category = models.CharField(max_length=50, default='Uncategorized', null=False)
+    board = models.ForeignKey("parliament.Board")
 
 
 class Profile(models.Model):
@@ -23,6 +24,7 @@ class Profile(models.Model):
     about = models.TextField(blank=True)
     topics = models.ManyToManyField(Topic, through='UserTopic')
     municipality = models.CharField(default='N/A', max_length=50)
+    image = models.TextField(default='')
 
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
@@ -38,10 +40,12 @@ class Problem(models.Model):
     topic = models.ForeignKey(Topic)
     user = models.ForeignKey(User)
     date = models.DateField(null=False)
+    status = models.IntegerField(default=0)  # 0 - postavljen, 1 - u procesu 2 - resen
     title = models.TextField(max_length=140)
     description = models.TextField(default="")
     votes_up = models.IntegerField(default=0)
     votes_down = models.IntegerField(default=0)
+    image = models.TextField(default='')
 
 
 class UserProblem(models.Model):
@@ -51,4 +55,6 @@ class UserProblem(models.Model):
 
 
 class ProblemSolved(models.Model):
-    user = models.ForeignKey(Profile)
+    problem = models.ForeignKey(Problem)
+    member = models.ForeignKey('parliament.Member')
+    description = models.TextField(max_length=10000)

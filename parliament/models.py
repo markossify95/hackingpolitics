@@ -7,7 +7,7 @@ class Member(models.Model):
     name = models.CharField(max_length=50)
     party = models.CharField(max_length=200)
     bio = models.TextField(max_length=36000)
-
+    image = models.TextField(default='')
 
 class Board(models.Model):
     name = models.CharField(max_length=200)

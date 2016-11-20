@@ -9,7 +9,8 @@ urlpatterns = [
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^problem/new/$', ProblemInstancePost.as_view(), name='problem_post'),
     url(r'^profile/(?P<pk>[0-9]+)/$', ProfileInstance.as_view(), name='profile'),
-    url(r'^problem/(?P<pk>[0-9]+)/$', ProblemInstance.as_view(), name='problem'),
-    url(r'^problem/filter', ProblemFilter.as_view(), name='problem'),
+    url(r'^problem/(?P<pk>[0-9]+)/$', ProblemInstance.as_view(), name='problem-instance'),
+    url(r'^problem/filter', ProblemFilter.as_view(), name='problem-filter'),
+    url(r'^problem/vote', Voter.as_view(), name='voter'),
 
 ]

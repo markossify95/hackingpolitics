@@ -124,22 +124,85 @@ class ProblemFilter(APIView):
     def post(self, request):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-        date = body['date']
+        # date = body['date']
         topic = body['topic']
         min = body['min']
         search_query = body['search_query']
+        order_by = body['order_by']
+        number_of = body['number_of']
         result_set = Problem.objects.all()
-        if date != '':
-            result_set = result_set.filter(date=date)
-        if topic is not []:
+        # if date != '':
+        #     result_set = result_set.filter(date=date)
+        if len(topic) > 0:
             result_set = result_set.filter(topic_id__in=topic)
         if min != 0:
-            result_set = result_set.filter(votes_down__gte=min)  # TODO
-        if search_query:
-            result_set = Problem.objects.filter(Q(topic__category__contains=search_query) |
-                                                Q(user__first_name__contains=search_query) |
-                                                Q(user__last_name__contains=search_query) |
-                                                Q(title__contains=search_query) |
-                                                Q(description__contains=search_query))
+            result_set = result_set.filter(votes_up__gte=min)  # TODO
+        if search_query != '':
+            result_set = result_set.filter(Q(topic__category__contains=search_query) |
+                                           Q(user__first_name__contains=search_query) |
+                                           Q(user__last_name__contains=search_query) |
+                                           Q(title__contains=search_query) |
+                                           Q(description__contains=search_query))
+        if order_by != '':
+            result_set = result_set.order_by("-" + order_by)
+        if number_of > 0:
+            result_set = result_set[:number_of]
+
         serializer = ProblemSerializer(result_set, many=True)
         return Response(serializer.data)
+
+
+class Voter(APIView):
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        user_id = body['user_id']
+        problem_id = body['problem_id']
+        vote = body['vote']
+        problem = Problem.objects.get(id=problem_id)
+        profile = Profile.objects.get(user_id=user_id)
+        try:
+            voted = UserProblem.objects.get(user_id=profile.id, problem_id=problem_id)
+            if vote == 0:
+                if voted.vote_type == 0:
+                    problem.votes_down -= 1
+                    voted.delete()
+                else:
+                    problem.votes_down -= 1
+                    problem.votes_up += 1
+                    voted.vote_type = 1
+                    voted.save()
+                problem.save()
+            else:
+                if voted.vote_type == 0:
+                    problem.votes_down -= 1
+                    problem.votes_up += 1
+                    voted.vote_type = 1
+                    voted.save()
+                else:
+                    problem.votes_up -= 1
+                    voted.delete()
+                problem.save()
+            serializer = ProblemSerializer(data=problem)
+            if serializer.is_valid():
+                return Response(serializer.data)
+            else:
+                return Response(status=200)
+        except UserProblem.DoesNotExist:
+            if vote == 0:
+                problem.votes_down += 1
+                problem.save()
+                up = UserProblem(user_id=profile.id, problem_id=problem_id)
+                up.vote_type = 0
+                up.save()
+            else:
+                problem.votes_up += 1
+                problem.save()
+                up = UserProblem(user_id=profile.id, problem_id=problem_id)
+                up.vote_type = 1
+                up.save()
+            serializer = ProblemSerializer(data=problem)
+            if serializer.is_valid():
+                return Response(serializer.data)
+            else:
+                return Response(status=200)

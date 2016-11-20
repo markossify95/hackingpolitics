@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
+from django.core import serializers as srl
 from .models import *
 from .serializers import *
 from django.http import HttpResponse, HttpResponseForbidden
@@ -67,3 +68,12 @@ class VotesView(APIView):
             return Response(serializer.data)
         else:
             raise Http404()
+
+
+class Recommendation(APIView):
+    def get(self, request, id):
+        result_set = Member.objects.raw(
+            "SELECT * FROM parliament_member WHERE id in (SELECT member_id from parliament_board_member WHERE board_id = " + id + ") ")
+
+        data = srl.serialize('json', result_set, fields=('id', 'name', 'party', 'image', 'bio'))
+        return HttpResponse(data)
